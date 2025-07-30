@@ -3,13 +3,14 @@ kind: Ingress
 metadata:
     name: php-ingress
     annotations:
-        kubernetes.io/ingress.class: "gce" # Still works, but see note below
+        nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+    ingressClassName: nginx
     rules:
         - http:
               paths:
-                  - path: /
-                    pathType: Prefix
+                  - path: /?(.*)
+                    pathType: ImplementationSpecific
                     backend:
                         service:
                             name: php-service
