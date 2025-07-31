@@ -26,21 +26,16 @@ spec:
                             secretKeyRef:
                                 name: mysql-secret
                                 key: DB_NAME
-                      - name: MYSQL_USER
-                        valueFrom:
-                            secretKeyRef:
-                                name: mysql-secret
-                                key: DB_USER
-                      - name: MYSQL_PASSWORD
-                        valueFrom:
-                            secretKeyRef:
-                                name: mysql-secret
-                                key: DB_PASSWORD
                   ports:
                       - containerPort: 3306
                   volumeMounts:
                       - name: mysql-persistent-storage
                         mountPath: /var/lib/mysql
+                      - name: mysql-init-script
+                        mountPath: /docker-entrypoint-initdb.d
             volumes:
                 - name: mysql-persistent-storage
-                  emptyDir: {} # Use PVC instead of emptyDir for persistence
+                  emptyDir: {} # Replace with PVC for real persistence
+                - name: mysql-init-script
+                  configMap:
+                      name: mysql-init-script
