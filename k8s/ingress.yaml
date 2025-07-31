@@ -3,8 +3,10 @@ kind: Ingress
 metadata:
     name: php-ingress
     annotations:
-        kubernetes.io/ingress.class: "gce" # Still works, but see note below
-
+        kubernetes.io/ingress.class: "nginx"
+        nginx.ingress.kubernetes.io/rewrite-target: /
+        nginx.ingress.kubernetes.io/limit-rpm: "10"
+        nginx.ingress.kubernetes.io/cors-allow-origin: "*"
 spec:
     rules:
         - http:
@@ -14,6 +16,5 @@ spec:
                     backend:
                         service:
                             name: php-service
-
                             port:
                                 number: 80
