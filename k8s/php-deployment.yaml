@@ -43,3 +43,13 @@ spec:
                             secretKeyRef:
                                 name: mysql-secret
                                 key: DB_PORT
+
+                  volumeMounts:                                   # ← ADD THIS BLOCK
+                      - name: php-config
+                        mountPath: /usr/local/etc/php/php.ini
+                        subPath: php.ini
+
+            volumes:                                             # ← ADD THIS BLOCK UNDER `spec`
+                - name: php-config
+                  configMap:
+                      name: php-config
