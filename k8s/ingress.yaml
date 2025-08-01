@@ -4,13 +4,15 @@ metadata:
     name: php-ingress
     annotations:
         nginx.ingress.kubernetes.io/rewrite-target: /
+        nginx.ingress.kubernetes.io/limit-rpm: "10"
+        nginx.ingress.kubernetes.io/cors-allow-origin: "*"
 spec:
     ingressClassName: nginx
     rules:
         - http:
               paths:
-                  - path: /?(.*)
-                    pathType: ImplementationSpecific
+                  - path: /
+                    pathType: Prefix
                     backend:
                         service:
                             name: php-service
