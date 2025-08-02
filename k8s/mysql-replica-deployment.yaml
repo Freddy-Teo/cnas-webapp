@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-replica-config
+data:
+  my.cnf: |
+    [mysqld]
+    server-id = 2
+    relay-log = mysql-relay-bin
+    log-bin = mysql-bin
+    binlog-format = ROW
+    gtid-mode=ON
+    enforce-gtid-consistency=ON
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-replica-pvc-new  # ⬅️ Changed name to start fresh
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-replica
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-replica
+  template:
+    metadata:
+      labels:
+        app: mysql-replica
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: DB_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: DB_NAME
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-replica-storage
+              mountPath: /var/lib/mysql
+            - name: mysql-config
+              mountPath: /etc/mysql/conf.d
+      volumes:
+        - name: mysql-replica-storage
+          persistentVolumeClaim:
+            claimName: mysql-replica-pvc-new  # ⬅️ Matches new PVC name
+        - name: mysql-config
+          configMap:
+            name: mysql-replica-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-replica-service
+spec:
+  selector:
+    app: mysql-replica
+  ports:
+    - port: 3306
+      targetPort: 3306
+  type: ClusterIP
