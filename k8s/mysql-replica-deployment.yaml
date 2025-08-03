@@ -15,7 +15,7 @@ data:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-replica-pvc-new  # ⬅️ Changed name to start fresh
+  name: mysql-replica-pvc-new
 spec:
   accessModes:
     - ReadWriteOnce
@@ -37,6 +37,16 @@ spec:
       labels:
         app: mysql-replica
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - mysql
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: mysql
           image: mysql:8.0
@@ -61,7 +71,7 @@ spec:
       volumes:
         - name: mysql-replica-storage
           persistentVolumeClaim:
-            claimName: mysql-replica-pvc-new  # ⬅️ Matches new PVC name
+            claimName: mysql-replica-pvc-new
         - name: mysql-config
           configMap:
             name: mysql-replica-config

@@ -1,0 +1,7 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: php-cert
+spec:
+  domains:
+    - 34.49.191.134

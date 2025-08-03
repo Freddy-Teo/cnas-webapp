@@ -1,55 +1,70 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: webapp
+  name: webapp
 spec:
-    replicas: 2
-    selector:
-        matchLabels:
-            app: webapp
-    template:
-        metadata:
-            labels:
-                app: webapp
-        spec:
-            containers:
-                - name: webapp
-                  image: gcr.io/cnas-assignment/webapp:latest
-                  ports:
-                      - containerPort: 80
-                  env:
-                      - name: DB_HOST
-                        valueFrom:
-                            secretKeyRef:
-                                name: mysql-secret
-                                key: DB_HOST
-                      - name: DB_USER
-                        valueFrom:
-                            secretKeyRef:
-                                name: mysql-secret
-                                key: DB_USER
-                      - name: DB_PASSWORD
-                        valueFrom:
-                            secretKeyRef:
-                                name: mysql-secret
-                                key: DB_PASSWORD
-                      - name: DB_NAME
-                        valueFrom:
-                            secretKeyRef:
-                                name: mysql-secret
-                                key: DB_NAME
-                      - name: DB_PORT
-                        valueFrom:
-                            secretKeyRef:
-                                name: mysql-secret
-                                key: DB_PORT
-
-                  volumeMounts:                                   # ← ADD THIS BLOCK
-                      - name: php-config
-                        mountPath: /usr/local/etc/php/php.ini
-                        subPath: php.ini
-
-            volumes:                                             # ← ADD THIS BLOCK UNDER `spec`
-                - name: php-config
-                  configMap:
-                      name: php-config
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - webapp
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: webapp
+          image: gcr.io/cnas-assignment/webapp:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"           # Needed for autoscaling to work
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: DB_HOST
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: DB_PASSWORD
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: DB_NAME
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: DB_PORT
+          volumeMounts:
+            - name: php-config
+              mountPath: /usr/local/etc/php/php.ini
+              subPath: php.ini
+      volumes:
+        - name: php-config
+          configMap:
+            name: php-config
