@@ -11,6 +11,8 @@ data:
     binlog-format = ROW
     gtid-mode=ON
     enforce-gtid-consistency=ON
+    read_only = 1
+    super_read_only = 1
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -21,7 +23,8 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 20Gi
+      storage: 1Gi
+  storageClassName: standard
 ---
 apiVersion: apps/v1
 kind: Deployment

@@ -35,7 +35,7 @@ spec:
               cpu: "500m"
               memory: "256Mi"
           securityContext:
-            runAsNonRoot: true
+            #runAsNonRoot: false
             allowPrivilegeEscalation: false
           env:
             - name: DB_HOST

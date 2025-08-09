@@ -1,4 +1,0 @@
-volumeMounts:
-  - name: mysql-config
-    mountPath: /etc/mysql/my.cnf
-    subPath: my.cnf
