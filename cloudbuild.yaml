@@ -18,14 +18,19 @@ steps:
       - 'CLOUDSDK_COMPUTE_ZONE=us-east1'
       - 'CLOUDSDK_CONTAINER_CLUSTER=webapp-cluster'
 
-  # Step 4: Rollback if deployment fails (add error checking)
+  # Step 4: Rollback if deployment fails using a custom script
   - name: 'gcr.io/cloud-builders/kubectl'
+    entrypoint: 'bash'
     args:
-      - 'rollout'
-      - 'undo'
-      - 'deployment/webapp'
-    when: 
-      status: FAILURE
+      - '-c'
+      - |
+        if kubectl rollout status deployment/cnas-webapp --namespace=default; then
+          echo "Deployment successful!"
+        else
+          echo "Deployment failed, rolling back..."
+          kubectl rollout undo deployment/cnas-webapp --namespace=default
+          exit 1
+        fi
 
 images:
   - 'gcr.io/cnas-assignment/cnas-webapp:$COMMIT_SHA'
