@@ -12,7 +12,7 @@ steps:
     args:
       - 'set'
       - 'image'
-      - 'deployment/cnas-webapp'
+      - 'deployment/webapp'
       - 'cnas-webapp=gcr.io/cnas-assignment/cnas-webapp:$COMMIT_SHA'
     env:
       - 'CLOUDSDK_COMPUTE_REGION=us-east1'
@@ -25,4 +25,5 @@ timeout: '600s'
 
 options:
   logging: CLOUD_LOGGING_ONLY
+
 
