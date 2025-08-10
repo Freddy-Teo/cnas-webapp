@@ -12,11 +12,19 @@ steps:
     args:
       - 'set'
       - 'image'
-      - 'deployment/webapp'
-      - 'webapp=gcr.io/cnas-assignment/cnas-webapp:$COMMIT_SHA'
+      - 'deployment/cnas-webapp'
+      - 'cnas-webapp=gcr.io/cnas-assignment/cnas-webapp:$COMMIT_SHA'
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-east1'
       - 'CLOUDSDK_CONTAINER_CLUSTER=webapp-cluster'
+
+  # Step 4: Rollback if deployment fails (add error checking)
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - 'rollout'
+      - 'undo'
+      - 'deployment/webapp'
+    when: 'FAILURE'
 
 images:
   - 'gcr.io/cnas-assignment/cnas-webapp:$COMMIT_SHA'
@@ -25,4 +33,3 @@ timeout: '600s'
 
 options:
   logging: CLOUD_LOGGING_ONLY
-
