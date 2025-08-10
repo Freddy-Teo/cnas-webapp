@@ -24,7 +24,8 @@ steps:
       - 'rollout'
       - 'undo'
       - 'deployment/webapp'
-    when: 'FAILURE'
+    when: 
+      status: FAILURE
 
 images:
   - 'gcr.io/cnas-assignment/cnas-webapp:$COMMIT_SHA'
