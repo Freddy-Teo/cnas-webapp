@@ -22,3 +22,6 @@ images:
   - 'gcr.io/cnas-assignment/cnas-webapp:$COMMIT_SHA'
 
 timeout: '600s'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
