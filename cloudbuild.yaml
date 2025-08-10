@@ -24,11 +24,11 @@ steps:
     args:
       - '-c'
       - |
-        if kubectl rollout status deployment/cnas-webapp --namespace=default; then
+        if kubectl rollout status deployment/webapp --namespace=default; then
           echo "Deployment successful!"
         else
           echo "Deployment failed, rolling back..."
-          kubectl rollout undo deployment/cnas-webapp --namespace=default
+          kubectl rollout undo deployment/webapp --namespace=default
           exit 1
         fi
 
@@ -39,4 +39,5 @@ timeout: '600s'
 
 options:
   logging: CLOUD_LOGGING_ONLY
+
 
